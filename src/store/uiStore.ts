@@ -29,9 +29,35 @@ export interface ExploreCourse {
   image?: string;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  iconType: 'emoji' | 'image';
+  accentColor: string;
+  status: 'Active' | 'Inactive';
+  coursesCount: number;
+}
+
+export interface AdminCourse {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+  category: string;
+  status: 'Published' | 'Draft' | 'Active' | 'Inactive';
+  enrollmentsCount: number;
+  image?: string;
+  accentColor: string;
+  isFavorite?: boolean;
+}
+
 interface UIState {
-  currentView: 'landing' | 'student';
-  setCurrentView: (view: 'landing' | 'student') => void;
+  currentView: 'landing' | 'student' | 'admin';
+  setCurrentView: (view: 'landing' | 'student' | 'admin') => void;
   currentStudentTab: string;
   setCurrentStudentTab: (tab: string) => void;
   isSidebarOpen: boolean;
@@ -44,6 +70,26 @@ interface UIState {
   isSettingsOpen: boolean;
   setStudentInfo: (info: { name: string; email: string; university: string; avatar?: string }) => void;
   setIsSettingsOpen: (isOpen: boolean) => void;
+  
+  // Admin Profile Settings
+  adminName: string;
+  adminEmail: string;
+  adminRole: string;
+  adminAvatar: string;
+  isAdminSettingsOpen: boolean;
+  setAdminInfo: (info: { name: string; avatar?: string }) => void;
+  setIsAdminSettingsOpen: (isOpen: boolean) => void;
+  currentAdminTab: string;
+  setCurrentAdminTab: (tab: string) => void;
+  
+  // Categories State
+  categories: Category[];
+  addCategory: (category: Omit<Category, 'id' | 'coursesCount'>) => void;
+  
+  // Admin Courses State
+  adminCourses: AdminCourse[];
+  addAdminCourse: (course: Omit<AdminCourse, 'id' | 'enrollmentsCount'>) => void;
+  deleteAdminCourse: (id: string) => void;
   
   // Courses state
   courses: Course[];
@@ -113,6 +159,49 @@ export const useUIStore = create<UIState>((set) => ({
     studentAvatar: info.avatar !== undefined ? info.avatar : state.studentAvatar,
   })),
   setIsSettingsOpen: (isOpen) => set({ isSettingsOpen: isOpen }),
+
+  // Admin Profile Settings Default Values
+  adminName: 'Admin User',
+  adminEmail: 'admin@xebia.com',
+  adminRole: 'System Administrator',
+  adminAvatar: '',
+  isAdminSettingsOpen: false,
+  setAdminInfo: (info) => set((state) => ({
+    adminName: info.name,
+    adminAvatar: info.avatar !== undefined ? info.avatar : state.adminAvatar,
+  })),
+  setIsAdminSettingsOpen: (isOpen) => set({ isAdminSettingsOpen: isOpen }),
+  currentAdminTab: 'dashboard',
+  setCurrentAdminTab: (tab) => set({ currentAdminTab: tab }),
+
+  // Categories Default State & Actions
+  categories: [],
+  addCategory: (newCat) => set((state) => ({
+    categories: [
+      ...state.categories,
+      {
+        ...newCat,
+        id: `cat-${Date.now()}`,
+        coursesCount: 0,
+      }
+    ]
+  })),
+
+  // Admin Courses Default State & Actions
+  adminCourses: [],
+  addAdminCourse: (newCourse) => set((state) => ({
+    adminCourses: [
+      ...state.adminCourses,
+      {
+        ...newCourse,
+        id: `course-${Date.now()}`,
+        enrollmentsCount: 0,
+      }
+    ]
+  })),
+  deleteAdminCourse: (id) => set((state) => ({
+    adminCourses: state.adminCourses.filter(c => c.id !== id)
+  })),
 
   // Default courses
   courses: [

@@ -3,8 +3,6 @@ import { useUIStore } from '../../store';
 import { 
   Menu, 
   X, 
-  Moon, 
-  Sun,
   ArrowRight, 
   Check, 
   Users, 
@@ -12,15 +10,10 @@ import {
   Clock, 
   Award, 
   Cpu, 
-  Layers, 
   BarChart3, 
   TrendingUp, 
-  ChevronRight,
-  BookMarked,
-  Binary,
   GraduationCap,
   Building,
-  Settings,
   Brain,
   ClipboardList,
   Shield,
@@ -28,13 +21,11 @@ import {
 } from 'lucide-react';
 
 import logoPurple from '../../assets/logo/logo-purple-BChHg7OV.png';
-import logoWhite from '../../assets/logo/logo-white-BP39qsjW.png';
 
 export const LandingPage = () => {
   const { setCurrentView } = useUIStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Home');
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Typewriter effect state
   const [currentText, setCurrentText] = useState('');
@@ -77,14 +68,14 @@ export const LandingPage = () => {
   ];
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'dark bg-xebia-purpleDark text-white' : 'bg-xebia-blueishGrey text-xebia-darkGrey'} transition-colors duration-300 font-sans`}>
+    <div className="min-h-screen bg-xebia-blueishGrey text-xebia-darkGrey transition-colors duration-300 font-sans">
       {/* 1. STICKY HEADER FIXED NAVIGATION */}
       <header className="sticky top-0 z-50 bg-white border-b border-xebia-lightGrey/80 backdrop-blur-md bg-opacity-95 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Left side: logo */}
           <div className="flex items-center">
             <img 
-              src={isDarkMode ? logoWhite : logoPurple} 
+              src={logoPurple} 
               alt="Xebia Logo" 
               className="h-11 w-auto object-contain" 
             />
@@ -112,15 +103,8 @@ export const LandingPage = () => {
             })}
           </nav>
 
-          {/* Right side: Dark Mode toggle & CTA button */}
+          {/* Right side: CTA button */}
           <div className="hidden md:flex items-center gap-5">
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2 rounded-full hover:bg-xebia-blueishGrey text-xebia-purple transition-all duration-200"
-              aria-label="Toggle dark mode theme"
-            >
-              {isDarkMode ? <Sun size={20} className="text-xebia-orange" /> : <Moon size={20} />}
-            </button>
             <button
               onClick={() => document.getElementById('portals')?.scrollIntoView({ behavior: 'smooth' })}
               className="bg-xebia-purple text-white hover:bg-xebia-purpleBright px-6 py-2.5 rounded-full font-bold text-sm tracking-wide transition-all duration-200 shadow-md flex items-center gap-1.5 active:scale-95"
@@ -157,19 +141,13 @@ export const LandingPage = () => {
                 </a>
               ))}
             </nav>
-            <div className="pt-4 border-t border-xebia-lightGrey flex items-center justify-between gap-4">
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="p-2 rounded-full border border-xebia-lightGrey text-xebia-purple"
-              >
-                {isDarkMode ? <Sun size={20} className="text-xebia-orange" /> : <Moon size={20} />}
-              </button>
+            <div className="pt-4 border-t border-xebia-lightGrey">
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   document.getElementById('portals')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="flex-1 bg-xebia-purple text-white text-center py-2.5 rounded-md font-semibold text-sm hover:bg-xebia-purpleBright transition-colors"
+                className="w-full bg-xebia-purple text-white text-center py-2.5 rounded-md font-semibold text-sm hover:bg-xebia-purpleBright transition-colors"
               >
                 Get Started
               </button>
@@ -266,7 +244,10 @@ export const LandingPage = () => {
           </div>
 
           {/* Admin Portal Card */}
-          <div className="group bg-white rounded-2xl p-8 border border-xebia-lightGrey shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+          <div 
+            onClick={() => setCurrentView('admin')}
+            className="group bg-white rounded-2xl p-8 border border-xebia-lightGrey shadow-sm hover:shadow-xl hover:border-b-4 hover:border-b-xebia-emerald cursor-pointer transition-all duration-300 flex flex-col justify-between"
+          >
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="p-3 bg-xebia-emerald text-white rounded-xl shadow-md">
@@ -301,7 +282,10 @@ export const LandingPage = () => {
             </div>
 
             <div className="mt-8 pt-4">
-              <button className="w-full bg-xebia-emerald hover:opacity-90 text-white text-center py-3 rounded-lg font-bold text-sm transition-all duration-200 flex items-center justify-center gap-1.5">
+              <button 
+                onClick={(e) => { e.stopPropagation(); setCurrentView('admin'); }}
+                className="w-full bg-xebia-emerald hover:opacity-90 text-white text-center py-3 rounded-lg font-bold text-sm transition-all duration-200 flex items-center justify-center gap-1.5"
+              >
                 Admin Portal <ArrowRight size={15} />
               </button>
             </div>
@@ -737,3 +721,6 @@ export const LandingPage = () => {
     </div>
   );
 };
+
+
+

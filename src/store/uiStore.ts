@@ -49,10 +49,25 @@ export interface AdminCourse {
   level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
   category: string;
   status: 'Published' | 'Draft' | 'Active' | 'Inactive';
+  type?: 'Free' | 'Paid';
+  price?: string;
+  duration?: string;
+  trainer?: string;
   enrollmentsCount: number;
   image?: string;
   accentColor: string;
   isFavorite?: boolean;
+}
+
+export type NotificationType = 'course' | 'assessment' | 'reply' | 'result' | 'system';
+
+export interface Notification {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  isRead: boolean;
+  type: NotificationType;
 }
 
 interface UIState {
@@ -90,6 +105,7 @@ interface UIState {
   adminCourses: AdminCourse[];
   addAdminCourse: (course: Omit<AdminCourse, 'id' | 'enrollmentsCount'>) => void;
   deleteAdminCourse: (id: string) => void;
+  releaseAdminCourses: (ids: string[]) => void;
   
   // Courses state
   courses: Course[];
@@ -119,14 +135,8 @@ interface UIState {
   }) => void;
 
   // Notifications state
-  notifications: {
-    id: string;
-    title: string;
-    description: string;
-    time: string;
-    isRead: boolean;
-    type: 'course' | 'assessment' | 'reply' | 'result';
-  }[];
+  notifications: Notification[];
+  addNotification: (notification: Omit<Notification, 'id' | 'isRead'>) => void;
   markAllNotificationsAsRead: () => void;
   markNotificationAsRead: (id: string) => void;
 
@@ -195,12 +205,23 @@ export const useUIStore = create<UIState>((set) => ({
       {
         ...newCourse,
         id: `course-${Date.now()}`,
+        type: newCourse.type || 'Free',
+        price: newCourse.price || 'Free',
+        duration: newCourse.duration || 'Self-paced',
+        trainer: newCourse.trainer || 'Xebia Mentor',
         enrollmentsCount: 0,
       }
     ]
   })),
   deleteAdminCourse: (id) => set((state) => ({
     adminCourses: state.adminCourses.filter(c => c.id !== id)
+  })),
+  releaseAdminCourses: (ids) => set((state) => ({
+    adminCourses: state.adminCourses.map((course) =>
+      ids.includes(course.id)
+        ? { ...course, status: 'Published' }
+        : course
+    )
   })),
 
   // Default courses
@@ -300,8 +321,26 @@ export const useUIStore = create<UIState>((set) => ({
       time: '3 days ago',
       isRead: true,
       type: 'result',
+    },
+    {
+      id: '5',
+      title: 'System Update',
+      description: 'The platform has been refreshed with a new learner experience.',
+      time: 'Just now',
+      isRead: false,
+      type: 'system',
     }
   ],
+  addNotification: (notification) => set((state) => ({
+    notifications: [
+      {
+        ...notification,
+        id: `notif-${Date.now()}`,
+        isRead: false,
+      },
+      ...state.notifications,
+    ],
+  })),
   markAllNotificationsAsRead: () => set((state) => ({
     notifications: state.notifications.map((n) => ({ ...n, isRead: true })),
   })),

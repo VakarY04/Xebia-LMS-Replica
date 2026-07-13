@@ -5,3 +5,4 @@ export * from './AdminCategories';
 export * from './AdminCreateCategory';
 export * from './AdminCourses';
 export * from './AdminCreateCourse';
+export * from './AdminNotifications';

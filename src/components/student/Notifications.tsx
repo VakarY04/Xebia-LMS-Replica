@@ -44,6 +44,12 @@ export const Notifications: React.FC = () => {
             <Award size={18} />
           </div>
         );
+      case 'system':
+        return (
+          <div className="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center border border-slate-200/70 flex-shrink-0">
+            <Bell size={18} />
+          </div>
+        );
       default:
         return (
           <div className="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100 flex-shrink-0">

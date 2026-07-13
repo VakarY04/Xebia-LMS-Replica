@@ -6,7 +6,8 @@ import {
   Layers, 
   BarChart3, 
   ChevronRight, 
-  LogOut 
+  LogOut,
+  Bell 
 } from 'lucide-react';
 import { useUIStore } from '../../store';
 import logoWhite from '../../assets/logo/logo-white-BP39qsjW.png';
@@ -25,6 +26,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentTab = 'dashbo
     { id: 'categories', label: 'Categories', icon: <Tag size={20} /> },
     { id: 'courses', label: 'Courses', icon: <BookOpen size={20} /> },
     { id: 'curriculum', label: 'Curriculum', icon: <Layers size={20} /> },
+    { id: 'notifications', label: 'Notifications', icon: <Bell size={20} /> },
   ];
 
   const getInitials = (name: string) => {

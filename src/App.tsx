@@ -2,7 +2,7 @@ import React from 'react';
 import { useUIStore } from './store';
 import { LandingPage } from './components/landing';
 import { Sidebar, Dashboard, Notes, Sandbox, Batches, Assessments, Results, SettingsModal, MyCourses, Notifications, Feedback, ExploreCourses, Cart } from './components/student';
-import { AdminSidebar, AdminDashboard, AdminSettingsModal, AdminCategories, AdminCreateCategory, AdminCourses, AdminCreateCourse } from './components/admin';
+import { AdminSidebar, AdminDashboard, AdminSettingsModal, AdminCategories, AdminCreateCategory, AdminCourses, AdminCreateCourse, AdminNotifications } from './components/admin';
 import { AdminCurriculum } from './components/admin/AdminCurriculum';
 import { Menu, Search, Bell, Settings } from 'lucide-react';
 
@@ -11,6 +11,7 @@ const adminTabLabels: Record<string, string> = {
   categories: 'Categories',
   courses: 'Courses',
   curriculum: 'Curriculum',
+  notifications: 'Notifications',
   'analytics-overview': 'Analytics Overview',
   'analytics-reports': 'Analytics Reports',
 };
@@ -75,6 +76,8 @@ const App: React.FC = () => {
         return <AdminCreateCourse />;
       case 'curriculum':
         return <AdminCurriculum />;
+      case 'notifications':
+        return <AdminNotifications />;
       case 'analytics-overview':
       case 'analytics-reports':
         return (

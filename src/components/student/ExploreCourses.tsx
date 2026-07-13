@@ -133,11 +133,33 @@ const EXPLORE_COURSES: ExploreCourse[] = [
 
 export const ExploreCourses: React.FC = () => {
   const [filter, setFilter] = useState<'All' | 'Free' | 'Paid'>('All');
-  const { cart, courses, addToCart, removeFromCart } = useUIStore();
+  const { cart, courses, adminCourses, addToCart, removeFromCart } = useUIStore();
 
   // Filter out any courses that are already inside My Courses
   const enrolledTitles = courses.map(c => c.title.toLowerCase());
-  const availableExploreCourses = EXPLORE_COURSES.filter(ec => {
+  const releasedAdminCourses: ExploreCourse[] = adminCourses
+    .filter((course) => course.status === 'Published')
+    .map((course) => ({
+      id: course.id,
+      title: course.title,
+      description: course.description || 'Newly released course from the admin library.',
+      category: course.category,
+      level: course.level === 'Expert' ? 'Advanced' : course.level,
+      duration: course.duration || 'Self-paced',
+      trainer: course.trainer || 'Xebia Mentor',
+      price: course.price || 'Free',
+      type: course.type || 'Free',
+      gradient: 'from-[#6C1D5F] to-[#01AC9F]',
+      image: course.image,
+    }));
+
+  const mergedExploreCourses = [...releasedAdminCourses, ...EXPLORE_COURSES];
+  const dedupedExploreCourses = mergedExploreCourses.filter((course, index, array) => {
+    const firstMatchIndex = array.findIndex((item) => item.title.toLowerCase() === course.title.toLowerCase());
+    return firstMatchIndex === index;
+  });
+
+  const availableExploreCourses = dedupedExploreCourses.filter(ec => {
     return !enrolledTitles.some(et => 
       et.includes(ec.title.toLowerCase()) || 
       ec.title.toLowerCase().includes(et)

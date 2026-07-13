@@ -131,6 +131,8 @@ export const AdminCreateCourse: React.FC = () => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [level, setLevel] = useState<'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'>('Beginner');
+  const [courseType, setCourseType] = useState<'Free' | 'Paid'>('Free');
+  const [price, setPrice] = useState('');
   const [language, setLanguage] = useState('English');
   const [durationHrs, setDurationHrs] = useState<number>(0);
   const [durationMin, setDurationMin] = useState<number>(0);
@@ -292,6 +294,10 @@ export const AdminCreateCourse: React.FC = () => {
       level,
       category: category || 'General',
       status: finalStatus,
+      type: courseType,
+      price: courseType === 'Paid' ? price.trim() || '₹999' : 'Free',
+      duration: durationHrs > 0 || durationMin > 0 ? `${durationHrs}h ${durationMin}m` : '0 hrs',
+      trainer: 'Xebia Mentor',
       image: thumbnailUrl || bannerUrl || undefined,
       accentColor: '#6C1D5F' // default Xebia theme color
     });
@@ -435,25 +441,46 @@ export const AdminCreateCourse: React.FC = () => {
                 </div>
               </div>
 
-              {/* Language & Duration Row */}
+              {/* Pricing & Duration Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Language selection */}
-                <div className="space-y-2 relative">
+                {/* Pricing selection */}
+                <div className="space-y-2">
                   <label className="text-xs font-black text-slate-400 uppercase tracking-widest block">
-                    Language / Locale
+                    Pricing
                   </label>
-                  <div className="relative">
-                    <select
-                      value={language}
-                      onChange={(e) => setLanguage(e.target.value)}
-                      className="w-full appearance-none bg-[#F8F9FD] hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-2xl px-5 py-3.5 text-xs font-bold text-slate-700 focus:outline-none transition-all pr-10 cursor-pointer"
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCourseType('Free')}
+                      className={`flex-1 rounded-2xl px-4 py-3 text-[10px] font-black transition-all ${
+                        courseType === 'Free'
+                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm'
+                          : 'bg-[#F8F9FD] border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
                     >
-                      {COMMON_LANGUAGES.map((lang) => (
-                        <option key={lang} value={lang}>{lang}</option>
-                      ))}
-                    </select>
-                    <ChevronDown size={14} className="text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      Free
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCourseType('Paid')}
+                      className={`flex-1 rounded-2xl px-4 py-3 text-[10px] font-black transition-all ${
+                        courseType === 'Paid'
+                          ? 'bg-[#6C1D5F] text-white shadow-md'
+                          : 'bg-[#F8F9FD] border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      Paid
+                    </button>
                   </div>
+                  {courseType === 'Paid' && (
+                    <input
+                      type="text"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="₹999"
+                      className="w-full bg-[#F8F9FD] border border-slate-200 hover:border-slate-300 focus:border-[#6C1D5F] rounded-2xl px-5 py-3.5 text-xs text-slate-800 focus:outline-none focus:bg-white transition-all font-semibold shadow-sm placeholder-slate-400"
+                    />
+                  )}
                 </div>
 
                 {/* Duration selection */}
@@ -487,6 +514,26 @@ export const AdminCreateCourse: React.FC = () => {
                     </div>
                   </div>
                   <p className="text-[10px] text-slate-400 font-bold">Hours and Minutes</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 relative">
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest block">
+                    Language / Locale
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      className="w-full appearance-none bg-[#F8F9FD] hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-2xl px-5 py-3.5 text-xs font-bold text-slate-700 focus:outline-none transition-all pr-10 cursor-pointer"
+                    >
+                      {COMMON_LANGUAGES.map((lang) => (
+                        <option key={lang} value={lang}>{lang}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={14} className="text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
               </div>
 
@@ -1145,6 +1192,12 @@ export const AdminCreateCourse: React.FC = () => {
                     <p className="text-xs text-slate-400 font-semibold line-clamp-3 leading-relaxed">
                       {shortDescription.trim() || 'Course description preview...'}
                     </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`px-2.5 py-1 rounded-lg text-[9px] uppercase font-black tracking-wider inline-block ${courseType === 'Paid' ? 'bg-[#6C1D5F]/10 text-[#6C1D5F]' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
+                      {courseType === 'Paid' ? (price.trim() || '₹999') : 'Free'}
+                    </span>
                   </div>
 
                   {/* Footer details */}

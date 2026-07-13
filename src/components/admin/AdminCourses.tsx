@@ -16,7 +16,7 @@ import {
 import { useUIStore } from '../../store';
 
 export const AdminCourses: React.FC = () => {
-  const { adminCourses, categories, addAdminCourse, deleteAdminCourse, setCurrentAdminTab } = useUIStore();
+  const { adminCourses, categories, addAdminCourse, deleteAdminCourse, releaseAdminCourses, setCurrentAdminTab } = useUIStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSort, setSelectedSort] = useState('All Courses');
@@ -24,6 +24,7 @@ export const AdminCourses: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedStatus, setSelectedStatus] = useState('All Status');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
 
   // Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -71,6 +72,33 @@ export const AdminCourses: React.FC = () => {
 
   const triggerFileUpload = () => {
     fileInputRef.current?.click();
+  };
+
+  const toggleCourseSelection = (id: string) => {
+    setSelectedCourseIds((current) =>
+      current.includes(id)
+        ? current.filter((courseId) => courseId !== id)
+        : [...current, id]
+    );
+  };
+
+  const toggleSelectAllVisible = () => {
+    const visibleIds = sortedCourses.map((course) => course.id);
+    const allVisibleSelected = visibleIds.every((id) => selectedCourseIds.includes(id));
+
+    if (allVisibleSelected) {
+      setSelectedCourseIds((current) => current.filter((id) => !visibleIds.includes(id)));
+      return;
+    }
+
+    setSelectedCourseIds((current) => Array.from(new Set([...current, ...visibleIds])));
+  };
+
+  const handleReleaseSelected = () => {
+    if (selectedCourseIds.length === 0) return;
+
+    releaseAdminCourses(selectedCourseIds);
+    setSelectedCourseIds([]);
   };
 
   const handleCreateSubmit = (e: React.FormEvent) => {
@@ -347,6 +375,26 @@ export const AdminCourses: React.FC = () => {
           <ChevronDown size={14} className="text-slate-400 absolute right-4 pointer-events-none" />
         </div>
 
+        <div className="flex flex-wrap items-center gap-2 lg:ml-auto">
+          <label className="flex items-center gap-2 bg-[#F8F9FD] border border-slate-200 rounded-2xl px-3 py-2 text-[10px] font-black text-slate-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={sortedCourses.length > 0 && sortedCourses.every((course) => selectedCourseIds.includes(course.id))}
+              onChange={toggleSelectAllVisible}
+              className="accent-[#6C1D5F]"
+            />
+            Select all visible
+          </label>
+          <button
+            type="button"
+            onClick={handleReleaseSelected}
+            disabled={selectedCourseIds.length === 0}
+            className="bg-[#01AC9F] hover:bg-[#078b82] text-white font-extrabold text-xs px-4 py-2.5 rounded-2xl shadow-md hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Release
+          </button>
+        </div>
+
       </div>
 
       {/* Showing X courses label */}
@@ -379,6 +427,15 @@ export const AdminCourses: React.FC = () => {
                 className="h-28 relative flex items-center justify-center transition-all duration-300 overflow-hidden"
                 style={{ backgroundColor: course.image ? 'transparent' : course.accentColor }}
               >
+                <label className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-white/90 px-2 py-1 rounded-full shadow-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={selectedCourseIds.includes(course.id)}
+                    onChange={() => toggleCourseSelection(course.id)}
+                    className="accent-[#6C1D5F]"
+                  />
+                  <span className="text-[9px] font-black uppercase text-slate-600">Select</span>
+                </label>
                 {course.image ? (
                   <img src={course.image} alt={course.title} className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-500" />
                 ) : (
@@ -413,9 +470,12 @@ export const AdminCourses: React.FC = () => {
                 </div>
 
                 {/* Footer Details */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-50 text-[10px] font-bold text-slate-400 mt-2">
+                <div className="flex items-center justify-between pt-4 border-t border-slate-50 text-[10px] font-bold text-slate-400 mt-2 gap-2">
                   <span className="px-2 py-1 bg-slate-50 text-slate-500 rounded-lg text-[9px] uppercase font-black">
                     {course.level}
+                  </span>
+                  <span className={`px-2 py-1 rounded-lg text-[9px] uppercase font-black ${course.type === 'Paid' ? 'bg-[#6C1D5F]/10 text-[#6C1D5F]' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
+                    {course.type === 'Paid' ? (course.price || '₹999') : 'Free'}
                   </span>
                   <span className="flex items-center gap-1.5 font-mono text-[9px]">
                     <span className="w-2 h-2 rounded-full" style={{ backgroundColor: course.accentColor }}></span>
@@ -436,6 +496,14 @@ export const AdminCourses: React.FC = () => {
           {sortedCourses.map((course) => (
             <div key={course.id} className="p-5 flex items-center justify-between gap-4 group">
               <div className="flex items-center gap-4 flex-grow min-w-0">
+                <label className="flex items-center gap-2 shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={selectedCourseIds.includes(course.id)}
+                    onChange={() => toggleCourseSelection(course.id)}
+                    className="accent-[#6C1D5F]"
+                  />
+                </label>
                 <div className="w-16 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-slate-50 border border-slate-100 flex items-center justify-center">
                   {course.image ? (
                     <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
@@ -455,6 +523,9 @@ export const AdminCourses: React.FC = () => {
                   {course.level}
                 </span>
                 <span className="text-slate-400 text-[10px]">{course.category}</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase ${course.type === 'Paid' ? 'bg-[#6C1D5F]/10 text-[#6C1D5F]' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
+                  {course.type === 'Paid' ? (course.price || '₹999') : 'Free'}
+                </span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase ${course.status === 'Published' ? 'text-emerald-600 bg-emerald-50' : 'text-slate-500 bg-slate-50'}`}>
                   {course.status}
                 </span>
